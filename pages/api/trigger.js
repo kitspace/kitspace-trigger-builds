@@ -14,6 +14,8 @@ export default (req, res) => {
     })
     .then(r => res.send(r.body))
     .catch(e => {
-      console.error(e);
+      console.error(e.response.body)
+      res.statusCode = e.response.statusCode
+      res.send(e.response.body)
     })
 };

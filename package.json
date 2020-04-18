@@ -1,5 +1,5 @@
 {
-  "name": "kitspace-builds",
+  "name": "kitspace-trigger-builds",
   "version": "0.1.0",
   "private": true,
   "scripts": {

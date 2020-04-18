@@ -2,7 +2,7 @@ import Head from 'next/head';
 import {useState} from 'react';
 
 export default function Home() {
-  const [count, setCount] = useState(null);
+  const [message, setMessage] = useState('');
   return (
     <div className="container">
       <Head>
@@ -16,17 +16,39 @@ export default function Home() {
             const res = await fetch('/api/trigger', {method: 'POST'}).then(r =>
               r.json(),
             );
-            setCount(res.remaining_requests)
+            if (res['@type'] === 'error') {
+              if (res.error_type === 'request_limit_reached') {
+                setMessage(
+                  `Error: reached limit of ${
+                    res.max_requests
+                  } re-build requests per ${res.per_second / 60} minutes.`,
+                );
+              } else {
+                setMessage('Error: ' + res.error_message);
+              }
+            } else {
+              setMessage(
+                <>
+                  Success, {res.remaining_requests} re-build requests left. View{' '}
+                  <a href="https://travis-ci.org/github/kitspace/kitspace/branches">
+                    build logs
+                  </a>
+                  .
+                </>,
+              );
+            }
           }}>
           Trigger re-build
         </button>
-        <div id="message">
-          {count == null ? null : `Re-build successfully triggered, ${count} left`}
-        </div>
+        <div id="message">{message}</div>
       </main>
 
       <footer>
         <a href="https://kitspace.org">kitspace.org</a>
+        <span>&nbsp;-&nbsp;</span>
+        <a href="https://travis-ci.org/github/kitspace/kitspace/branches">
+          build logs
+        </a>
       </footer>
 
       <style jsx>{`
@@ -64,11 +86,6 @@ export default function Home() {
           display: flex;
           justify-content: center;
           align-items: center;
-        }
-
-        a {
-          color: inherit;
-          text-decoration: none;
         }
       `}</style>
 
