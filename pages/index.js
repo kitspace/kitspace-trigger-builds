@@ -1,17 +1,28 @@
 import Head from 'next/head';
+import {useState} from 'react';
 
 export default function Home() {
+  const [count, setCount] = useState(null);
   return (
     <div className="container">
       <Head>
         <title>Kitspace Builds</title>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon.png" />
       </Head>
 
       <main>
-        <form action="/api/trigger" method="POST">
-          <button>Trigger re-build</button>
-        </form>
+        <button
+          onClick={async () => {
+            const res = await fetch('/api/trigger', {method: 'POST'}).then(r =>
+              r.json(),
+            );
+            setCount(res.remaining_requests)
+          }}>
+          Trigger re-build
+        </button>
+        <div id="message">
+          {count == null ? null : `Re-build successfully triggered, ${count} left`}
+        </div>
       </main>
 
       <footer>
@@ -26,6 +37,9 @@ export default function Home() {
           flex-direction: column;
           justify-content: center;
           align-items: center;
+        }
+        #message {
+          padding-top: 30px;
         }
 
         main {
